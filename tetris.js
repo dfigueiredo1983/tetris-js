@@ -32,27 +32,72 @@ class Tetris {
     }
 
     checkLeft() {
+        for(let i = 0; i < this.template.length; i++){
+            for(let j = 0; j < this.template.length; j++){
+                if(this.template[i][j] == 0) continue;
+                let realX = i + this.getTruncedPosition().x;
+                let realY = j + this.getTruncedPosition().y;
+                if(realX - 1 < 0){
+                    return false;
+                }
 
+                if(gameMap[realY][realX - 1].imageX != -1)
+                    return false;
+            }
+        }
+        
+        return true;
     }
-
+    
     checkRight() {
-
+        return true;
     }
-
-
+    
     moveLeft() {
-         
+        console.log('Mover para a esquerda')
+        if(this.checkLeft()){
+            this.x -= 1;
+        }
     }
-
+    
     moveRight() {
-         
+        console.log('Mover para a direita')        
+        if(this.checkRight()){
+            this.x += 1;
+        }
     }
-
+    
     moveBotton() {
-         
+        console.log('Mover para a baixo')
+        if(this.checkBotton()){
+            this.y += 1;
+        }
     }
 
     changeRotation() {
+        let tempTemplate = [];
+        for (let i = 0; i < this.template.length; i++)
+          tempTemplate[i] = this.template[i].slice();
+        let n = this.template.length;
+        for (let layer = 0; layer < n / 2; layer++) {
+          let first = layer;
+          let last = n - 1 - layer;
+          for (let i = first; i < last; i++) {
+            let offset = i - first;
+            let top = this.template[first][i];
+            this.template[first][i] = this.template[i][last]; // top = right
+            this.template[i][last] = this.template[last][last - offset]; //right = bottom
+            this.template[last][last - offset] =
+              this.template[last - offset][first];
+            //bottom = left
+            this.template[last - offset][first] = top; // left = top
+          }
+        }
+
+
+
+
+
 
     }
 
@@ -251,7 +296,24 @@ let resetVars = () => {
     gameMap = initialTwoDArr;
 };
 
-resetVars();
+
+window.addEventListener('keydown', (event) => {
+    let key = event.key;
+
+    console.log('Tecla pressionada: ', key)
+
+    if(key == 'ArrowLeft')
+        currentShape.moveLeft();
+    else if(key == 'ArrowRight')
+        currentShape.moveRight();
+    else if(key == 'ArrowDown')
+        currentShape.moveBotton();
+    else if(key == 'ArrowUp')
+        currentShape.changeRotation();
+
+});
+
+resetVars(); 
 gameLoop();
 
 
